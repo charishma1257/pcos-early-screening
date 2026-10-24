@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Home - PCOS Early Screening and Awareness{% endblock %}
+
+{% block content %}
+<div class="row align-items-center gy-5 py-4">
+    <!-- Hero Text -->
+    <div class="col-lg-7">
+        <div class="pe-lg-4">
+            <div class="d-inline-flex align-items-center gap-2 px-3 py-1-5 rounded-pill bg-lavender-subtle text-primary-custom fw-semibold small mb-3 border border-lavender">
+                <i class="bi bi-sparkles"></i> Non-Invasive Screening & Explainable AI
+            </div>
+            <h1 class="display-5 fw-bold text-dark tracking-tight mb-3">
+                Early Risk Awareness for Polycystic Ovary Syndrome (PCOS)
+            </h1>
+            <p class="lead text-secondary mb-4">
+                Polycystic Ovary Syndrome is one of the most underdiagnosed endocrine and metabolic conditions affecting women worldwide. 
+                This research-backed screening prototype evaluates self-reported symptoms and health markers using a calibrated 
+                machine-learning model and provides transparent SHAP explanations with actionable lifestyle routines.
+            </p>
+
+            <div class="d-flex flex-wrap gap-3 mb-4">
+                <a href="{{ url_for('screening') }}" class="btn btn-primary-custom btn-lg px-4 py-2-5 rounded-pill shadow-sm">
+                    <i class="bi bi-clipboard2-check me-2"></i> Start Free Screening
+                </a>
+                <a href="#how-it-works" class="btn btn-outline-secondary btn-lg px-4 py-2-5 rounded-pill">
+                    <i class="bi bi-info-circle me-2"></i> How It Works
+                </a>
+            </div>
+
+            <!-- Key Commitments -->
+            <div class="row g-3 pt-2 text-muted small">
+                <div class="col-sm-4 d-flex align-items-center gap-2">
+                    <i class="bi bi-shield-check text-success fs-5"></i>
+                    <span><strong>100% In-Memory</strong><br>No health data stored</span>
+                </div>
+                <div class="col-sm-4 d-flex align-items-center gap-2">
+                    <i class="bi bi-diagram-3 text-info fs-5"></i>
+                    <span><strong>SHAP Explanations</strong><br>Transparent factors</span>
+                </div>
+                <div class="col-sm-4 d-flex align-items-center gap-2">
+                    <i class="bi bi-calendar2-range text-primary-custom fs-5"></i>
+                    <span><strong>2-Wk & 1-Mo Plans</strong><br>Adaptive self-care</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Card / Info Box -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white hero-card border-top border-4 border-primary-custom">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="badge bg-lavender-subtle text-primary-custom px-3 py-1-5 rounded-pill fw-semibold">
+                    Screening Overview
+                </span>
+                <span class="text-success small fw-semibold">
+                    <i class="bi bi-shield-check me-1"></i> Private &amp; Secure
+                </span>
+            </div>
+
+            <h5 class="fw-bold text-dark mb-2">Early Symptom Awareness</h5>
+            <p class="text-muted small mb-3">
+                This non-invasive tool evaluates self-reported menstrual cycle patterns, dermatological signs, and lifestyle habits to support early personal health awareness.
+            </p>
+
+            <ul class="list-unstyled text-secondary small mb-4">
+                <li class="mb-2 d-flex align-items-start gap-2">
+                    <i class="bi bi-check2-circle text-primary-custom mt-0.5"></i>
+                    <span><strong>Non-Invasive:</strong> Complete the 4-part health questionnaire in under 3 minutes.</span>
+                </li>
+                <li class="mb-2 d-flex align-items-start gap-2">
+                    <i class="bi bi-check2-circle text-primary-custom mt-0.5"></i>
+                    <span><strong>Transparent Factors:</strong> Review personalized explanations showing which responses shaped your estimate.</span>
+                </li>
+                <li class="mb-2 d-flex align-items-start gap-2">
+                    <i class="bi bi-check2-circle text-primary-custom mt-0.5"></i>
+                    <span><strong>Actionable Guidance:</strong> Receive a tailored 2-week and 1-month routine to bring to your doctor.</span>
+                </li>
+            </ul>
+
+            <!-- Prominent Clinical Disclaimer Card -->
+            <div class="p-3 rounded-3 bg-lavender-subtle border border-lavender text-muted small">
+                <div class="fw-semibold text-dark mb-1 d-flex align-items-center gap-1">
+                    <i class="bi bi-exclamation-triangle-fill text-warning"></i> Clinical Disclaimer
+                </div>
+                {{ universal_disclaimer }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="py-5 border-top">
+    <div class="text-center max-w-700 mx-auto mb-5">
+        <h2 class="fw-bold text-dark mb-2">How the Prototype Works</h2>
+        <p class="text-muted">A streamlined, 3-step awareness flow focused on user clarity, privacy, and actionable guidance.</p>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-xs rounded-4 p-4 text-center bg-white">
+                <div class="step-badge mx-auto mb-3 bg-lavender-subtle text-primary-custom">1</div>
+                <h5 class="fw-bold text-dark mb-2">Complete Questionnaire</h5>
+                <p class="text-muted small mb-0">
+                    Enter basic health information, menstrual cycle patterns, dermatological symptoms, and lifestyle habits in a structured 4-part form.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-xs rounded-4 p-4 text-center bg-white">
+                <div class="step-badge mx-auto mb-3 bg-lavender-subtle text-primary-custom">2</div>
+                <h5 class="fw-bold text-dark mb-2">Calibrated ML & SHAP</h5>
+                <p class="text-muted small mb-0">
+                    The calibrated XGBoost pipeline maps outputs into empirical risk categories and generates a SHAP feature impact chart showing which responses influenced the prediction.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-xs rounded-4 p-4 text-center bg-white">
+                <div class="step-badge mx-auto mb-3 bg-lavender-subtle text-primary-custom">3</div>
+                <h5 class="fw-bold text-dark mb-2">Adaptive Lifestyle Plan</h5>
+                <p class="text-muted small mb-0">
+                    Review a customized 2-week or 1-month routine covering low-GI nutrition, movement, restorative sleep, and symptom journaling to bring to your doctor.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

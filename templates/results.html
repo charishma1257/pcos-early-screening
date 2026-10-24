@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block title %}Screening Results - PCOS Early Screening and Awareness{% endblock %}
+
+{% block content %}
+<div class="py-3">
+    <!-- Top Result Banner -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden">
+        <div class="p-4 p-md-5 text-center bg-lavender-subtle border-bottom border-lavender">
+            <span class="badge bg-white text-secondary px-3 py-1-5 rounded-pill fw-semibold mb-2 shadow-xs border">
+                Assessment Outcome
+            </span>
+            <h1 class="display-6 fw-bold text-dark mb-3">Preliminary Risk Estimate</h1>
+
+            <!-- Risk Badge -->
+            <div class="d-inline-flex flex-column align-items-center mb-1">
+                <span class="risk-pill badge bg-{{ risk_badge_class }} fs-4 px-4 py-2-5 rounded-pill shadow-sm">
+                    Provisional {{ risk_category }} Risk
+                </span>
+                <span class="text-muted small mt-2">
+                    Estimated Risk Likelihood: <strong>{{ probability_pct }}%</strong>
+                </span>
+            </div>
+        </div>
+
+        <!-- Clinical Next-Step Advisory -->
+        <div class="p-4 border-top">
+            <div class="alert {% if risk_category == 'High' %}alert-danger{% elif risk_category == 'Moderate' %}alert-warning{% else %}alert-info{% endif %} border-0 rounded-3 mb-0 shadow-xs">
+                <div class="d-flex align-items-start gap-3">
+                    <i class="bi {% if risk_category == 'High' %}bi-hospital-fill text-danger{% elif risk_category == 'Moderate' %}bi-exclamation-circle-fill text-warning{% else %}bi-check-circle-fill text-info{% endif %} fs-4 mt-1"></i>
+                    <div>
+                        {{ recommendations.advisory | safe }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phase 6: SHAP Explanation Section -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden">
+        <div class="card-header bg-lavender-subtle border-bottom border-lavender py-3 px-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="section-icon bg-white text-primary-custom rounded-circle p-1 shadow-xs">
+                        <i class="bi bi-diagram-3-fill fs-5"></i>
+                    </span>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">Feature Influence Analysis (SHAP)</h5>
+                        <span class="text-muted x-small">Key factors from your answers influencing this screening estimate</span>
+                    </div>
+                </div>
+                <span class="badge bg-white text-muted border px-2-5 py-1-5 rounded-pill small">
+                    <i class="bi bi-bar-chart-steps me-1"></i> Feature Impact Analysis
+                </span>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="row align-items-center gy-4">
+                <!-- SHAP Horizontal Bar Chart Image -->
+                <div class="col-lg-7 text-center">
+                    <div class="p-3 rounded-4 bg-white border shadow-xs text-center">
+                        <img src="data:image/png;base64,{{ shap_data.chart_base64 }}" 
+                             alt="SHAP Feature Contribution Horizontal Bar Chart" 
+                             class="img-fluid rounded-3">
+                    </div>
+                    <div class="text-muted x-small mt-2">
+                        <i class="bi bi-info-circle me-1"></i> Red bars push the risk estimate higher; green bars push the estimate lower.
+                    </div>
+                </div>
+
+                <!-- Plain English Narrative -->
+                <div class="col-lg-5">
+                    <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-1">
+                        <i class="bi bi-chat-left-text text-primary-custom"></i> Plain-English Interpretation
+                    </h6>
+                    <div class="p-3-5 rounded-4 bg-lavender-subtle border border-lavender small mb-4">
+                        <div class="text-secondary leading-relaxed">
+                            {{ shap_data.narrative | safe }}
+                        </div>
+                    </div>
+
+                    <!-- Top 5 Factors Table -->
+                    <h6 class="fw-bold text-dark small mb-2 d-flex align-items-center gap-1">
+                        <i class="bi bi-table text-primary-custom"></i> Top 5 Influencing Features
+                    </h6>
+                    <div class="table-responsive rounded-3 border bg-white">
+                        <table class="table table-sm table-hover align-middle mb-0 x-small">
+                            <thead class="table-light text-muted border-bottom">
+                                <tr>
+                                    <th class="ps-3 py-2">Feature</th>
+                                    <th class="py-2">Your Input</th>
+                                    <th class="text-end pe-3 py-2">SHAP Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for f in shap_data.top_factors %}
+                                <tr>
+                                    <td class="ps-3 py-2 fw-semibold text-dark">{{ f.display_name }}</td>
+                                    <td class="py-2"><span class="badge bg-light text-dark border">{{ f.user_val_str }}</span></td>
+                                    <td class="text-end pe-3 py-2">
+                                        <span class="badge {% if f.shap_value > 0 %}bg-danger-subtle text-danger border border-danger-subtle{% else %}bg-success-subtle text-success border border-success-subtle{% endif %}">
+                                            {{ "%+.2f"|format(f.shap_value) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Phase 7: Recommendation Plan Section -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden">
+        <div class="card-header bg-lavender-subtle border-bottom border-lavender py-3 px-4">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="section-icon bg-white text-primary-custom rounded-circle p-1 shadow-xs">
+                        <i class="bi bi-calendar2-range-fill fs-5"></i>
+                    </span>
+                    <div>
+                        <h5 class="fw-bold text-dark mb-0">Personalized Lifestyle & Self-Care Guidance</h5>
+                        <span class="text-muted x-small">General wellness support adapted to your responses</span>
+                    </div>
+                </div>
+
+                <!-- Plan Duration Toggle (Tabs) -->
+                <ul class="nav nav-pills custom-pills" id="planTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active px-3 py-1-5 rounded-pill small fw-semibold" id="two-week-tab" data-bs-toggle="pill" data-bs-target="#twoWeekPlan" type="button" role="tab" aria-controls="twoWeekPlan" aria-selected="true">
+                            <i class="bi bi-calendar-event me-1"></i> 2-Week Plan
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link px-3 py-1-5 rounded-pill small fw-semibold" id="one-month-tab" data-bs-toggle="pill" data-bs-target="#oneMonthPlan" type="button" role="tab" aria-controls="oneMonthPlan" aria-selected="false">
+                            <i class="bi bi-calendar-month me-1"></i> 1-Month Plan
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <!-- Tailored Focus Tags -->
+            {% if recommendations.tailored_tags %}
+            <div class="mb-4">
+                <span class="text-muted small fw-semibold me-2">Tailored based on your inputs:</span>
+                {% for tag in recommendations.tailored_tags %}
+                <span class="badge bg-light text-primary-custom border border-lavender rounded-pill me-1 mb-1 px-2-5 py-1-5 small">
+                    <i class="bi bi-tag-fill me-1"></i> {{ tag }}
+                </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="planTabContent">
+                <!-- 2-Week Plan Pane -->
+                <div class="tab-pane fade show active" id="twoWeekPlan" role="tabpanel" aria-labelledby="two-week-tab">
+                    <div class="row g-3">
+                        <!-- Pillar 1: Nutrition -->
+                        <div class="col-md-6">
+                            <div class="p-3-5 rounded-4 bg-light border h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-egg-fried text-primary-custom fs-5"></i>
+                                    <h6 class="fw-bold text-dark mb-0">Balanced Meals & Nutrition</h6>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    {% for item in recommendations.two_week_plan.nutrition %}
+                                    <li class="mb-1-5">{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Pillar 2: Activity -->
+                        <div class="col-md-6">
+                            <div class="p-3-5 rounded-4 bg-light border h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-person-walking text-primary-custom fs-5"></i>
+                                    <h6 class="fw-bold text-dark mb-0">Physical Activity & Movement</h6>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    {% for item in recommendations.two_week_plan.activity %}
+                                    <li class="mb-1-5">{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Pillar 3: Sleep -->
+                        <div class="col-md-4">
+                            <div class="p-3-5 rounded-4 bg-light border h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-moon-stars text-primary-custom fs-5"></i>
+                                    <h6 class="fw-bold text-dark mb-0">Sleep Routines</h6>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    {% for item in recommendations.two_week_plan.sleep %}
+                                    <li class="mb-1-5">{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Pillar 4: Stress -->
+                        <div class="col-md-4">
+                            <div class="p-3-5 rounded-4 bg-light border h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-heart text-primary-custom fs-5"></i>
+                                    <h6 class="fw-bold text-dark mb-0">Stress Management</h6>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    {% for item in recommendations.two_week_plan.stress %}
+                                    <li class="mb-1-5">{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Pillar 5: Tracking -->
+                        <div class="col-md-4">
+                            <div class="p-3-5 rounded-4 bg-light border h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-journal-medical text-primary-custom fs-5"></i>
+                                    <h6 class="fw-bold text-dark mb-0">Symptom Journaling</h6>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    {% for item in recommendations.two_week_plan.tracking %}
+                                    <li class="mb-1-5">{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1-Month Plan Pane -->
+                <div class="tab-pane fade" id="oneMonthPlan" role="tabpanel" aria-labelledby="one-month-tab">
+                    <div class="row g-3">
+                        <!-- Pillar 1: Nutrition -->
+                        <div class="col-md-6">
+                            <div class="p-3-5 rounded-4 bg-light border h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-egg-fried text-primary-custom fs-5"></i>
+                                    <h6 class="fw-bold text-dark mb-0">Balanced Meals & Nutrition (1-Month)</h6>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    {% for item in recommendations.one_month_plan.nutrition %}
+                                    <li class="mb-1-5">{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Pillar 2: Activity -->
+                        <div class="col-md-6">
+                            <div class="p-3-5 rounded-4 bg-light border h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-person-walking text-primary-custom fs-5"></i>
+                                    <h6 class="fw-bold text-dark mb-0">Physical Activity & Movement (1-Month)</h6>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    {% for item in recommendations.one_month_plan.activity %}
+                                    <li class="mb-1-5">{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Pillar 3: Sleep -->
+                        <div class="col-md-4">
+                            <div class="p-3-5 rounded-4 bg-light border h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-moon-stars text-primary-custom fs-5"></i>
+                                    <h6 class="fw-bold text-dark mb-0">Sleep Routines (1-Month)</h6>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    {% for item in recommendations.one_month_plan.sleep %}
+                                    <li class="mb-1-5">{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Pillar 4: Stress -->
+                        <div class="col-md-4">
+                            <div class="p-3-5 rounded-4 bg-light border h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-heart text-primary-custom fs-5"></i>
+                                    <h6 class="fw-bold text-dark mb-0">Stress Management (1-Month)</h6>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    {% for item in recommendations.one_month_plan.stress %}
+                                    <li class="mb-1-5">{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Pillar 5: Tracking -->
+                        <div class="col-md-4">
+                            <div class="p-3-5 rounded-4 bg-light border h-100">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-journal-medical text-primary-custom fs-5"></i>
+                                    <h6 class="fw-bold text-dark mb-0">Symptom Journaling (1-Month)</h6>
+                                </div>
+                                <ul class="small text-secondary ps-3 mb-0">
+                                    {% for item in recommendations.one_month_plan.tracking %}
+                                    <li class="mb-1-5">{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Boundary Notice -->
+            <div class="mt-4 p-3 rounded-3 bg-light border text-muted x-small">
+                <strong>Safety Disclaimer:</strong> These lifestyle recommendations provide general non-clinical wellness support only. 
+                They do not constitute medication advice, do not promise any health outcomes, and do not treat or cure PCOS or any medical disorder.
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex justify-content-center gap-3 py-3">
+        <a href="{{ url_for('screening') }}" class="btn btn-primary-custom px-4 py-2-5 rounded-pill shadow-xs">
+            <i class="bi bi-arrow-repeat me-1"></i> Restart Screening
+        </a>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary px-4 py-2-5 rounded-pill">
+            <i class="bi bi-house-door me-1"></i> Return Home
+        </a>
+    </div>
+</div>
+{% endblock %}

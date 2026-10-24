@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+
+{% block title %}Questionnaire - PCOS Early Screening and Awareness{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-3">
+    <div class="col-lg-9 col-xl-8">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <span class="badge bg-lavender-subtle text-primary-custom px-3 py-1-5 rounded-pill fw-semibold mb-2">
+                PCOS Risk Assessment
+            </span>
+            <h2 class="fw-bold text-dark tracking-tight">Health & Symptoms Questionnaire</h2>
+            <p class="text-muted max-w-600 mx-auto">
+                Please answer the following questions as accurately as possible. All calculations are performed in-memory and no personal data is stored.
+            </p>
+        </div>
+
+        <!-- Validation Errors Alert -->
+        {% if errors %}
+        <div class="alert alert-danger shadow-xs border-0 rounded-4 mb-4" role="alert">
+            <div class="d-flex align-items-center gap-2 fw-semibold mb-2">
+                <i class="bi bi-exclamation-triangle-fill"></i> Please correct the following issues:
+            </div>
+            <ul class="mb-0 ps-3 small">
+                {% for err in errors %}
+                <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form action="{{ url_for('predict') }}" method="POST" id="screeningForm" novalidate class="needs-validation">
+
+            <!-- Section 1: Basic Health Information -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden">
+                <div class="card-header bg-lavender-subtle border-bottom border-lavender py-3 px-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="section-icon bg-white text-primary-custom rounded-circle p-1 shadow-xs">
+                            <i class="bi bi-person-heart fs-5"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">1. Basic Health Information</h5>
+                            <span class="text-muted x-small">Physical measurements and general indicators</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <!-- Age -->
+                        <div class="col-md-6">
+                            <label for="age" class="form-label fw-semibold">Age (years) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="age" name="Age (yrs)" 
+                                   min="15" max="60" step="1" required 
+                                   value="{{ form_values.get('Age (yrs)', defaults.get('Age (yrs)', 28)|int) }}"
+                                   placeholder="e.g. 26">
+                            <div class="form-text x-small">Between 15 and 60 years.</div>
+                        </div>
+
+                        <!-- BMI / Helper Widget -->
+                        <div class="col-md-6">
+                            <label for="bmi" class="form-label fw-semibold">Body Mass Index (BMI) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="bmi" name="BMI" 
+                                       min="10" max="60" step="0.1" required 
+                                       value="{{ '%.1f'|format(form_values.get('BMI', defaults.get('BMI', 23.5))|float) }}"
+                                       placeholder="e.g. 23.5">
+                                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#bmiCalcCollapse" aria-expanded="false" aria-controls="bmiCalcCollapse">
+                                    <i class="bi bi-calculator me-1"></i> Calc
+                                </button>
+                            </div>
+                            <div class="form-text x-small">Enter directly or click "Calc" to calculate from height/weight.</div>
+                        </div>
+
+                        <!-- Collapsible Quick BMI Calculator -->
+                        <div class="col-12 collapse" id="bmiCalcCollapse">
+                            <div class="p-3 rounded-3 bg-light border border-dashed">
+                                <div class="fw-semibold small mb-2 text-dark"><i class="bi bi-calculator me-1"></i> Quick BMI Calculator</div>
+                                <div class="row g-2">
+                                    <div class="col-sm-5">
+                                        <label class="x-small text-muted">Height (cm)</label>
+                                        <input type="number" id="quickHeight" class="form-control form-control-sm" placeholder="e.g. 162" min="100" max="220">
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <label class="x-small text-muted">Weight (kg)</label>
+                                        <input type="number" id="quickWeight" class="form-control form-control-sm" placeholder="e.g. 58" min="30" max="200" step="0.1">
+                                    </div>
+                                    <div class="col-sm-2 d-flex align-items-end">
+                                        <button type="button" class="btn btn-sm btn-primary-custom w-100" id="btnApplyBmi">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Waist Circumference -->
+                        <div class="col-md-6">
+                            <label for="waist" class="form-label fw-semibold">Waist Circumference (inches) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="waist" name="Waist(inch)" 
+                                   min="15" max="70" step="0.5" required 
+                                   value="{{ form_values.get('Waist(inch)', defaults.get('Waist(inch)', 32)|int) }}"
+                                   placeholder="e.g. 32">
+                            <div class="form-text x-small">Measured around natural waistline above navel.</div>
+                        </div>
+
+                        <!-- Hip Circumference -->
+                        <div class="col-md-6">
+                            <label for="hip" class="form-label fw-semibold">Hip Circumference (inches) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="hip" name="Hip(inch)" 
+                                   min="20" max="70" step="0.5" required 
+                                   value="{{ form_values.get('Hip(inch)', defaults.get('Hip(inch)', 38)|int) }}"
+                                   placeholder="e.g. 38">
+                            <div class="form-text x-small">Measured around widest portion of buttocks.</div>
+                        </div>
+
+                        <!-- Pulse Rate -->
+                        <div class="col-md-6">
+                            <label for="pulse" class="form-label fw-semibold">Resting Pulse Rate (bpm)</label>
+                            <input type="number" class="form-control" id="pulse" name="Pulse rate(bpm)" 
+                                   min="40" max="140" step="1" 
+                                   value="{{ form_values.get('Pulse rate(bpm)', defaults.get('Pulse rate(bpm)', 72)|int) }}">
+                            <div class="form-text x-small">Normal adult resting rate is 60–100 bpm. Leave as 72 if unsure.</div>
+                        </div>
+
+                        <!-- Respiratory Rate -->
+                        <div class="col-md-6">
+                            <label for="rr" class="form-label fw-semibold">Respiratory Rate (breaths/min)</label>
+                            <input type="number" class="form-control" id="rr" name="RR (breaths/min)" 
+                                   min="10" max="40" step="1" 
+                                   value="{{ form_values.get('RR (breaths/min)', defaults.get('RR (breaths/min)', 18)|int) }}">
+                            <div class="form-text x-small">Normal adult resting rate is 12–20 breaths/min. Leave as 18 if unsure.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Menstrual Cycle Information -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden">
+                <div class="card-header bg-lavender-subtle border-bottom border-lavender py-3 px-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="section-icon bg-white text-primary-custom rounded-circle p-1 shadow-xs">
+                            <i class="bi bi-calendar2-heart fs-5"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">2. Menstrual Cycle Information</h5>
+                            <span class="text-muted x-small">Cycle regularity and period duration</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <!-- Cycle Regularity -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold d-block">Cycle Regularity <span class="text-danger">*</span></label>
+                            {% set sel_cycle = form_values.get('Cycle(R/I)', defaults.get('Cycle(R/I)', 2))|int %}
+                            <div class="d-flex flex-column gap-2">
+                                <div class="form-check p-2-5 rounded-3 border bg-light">
+                                    <input class="form-check-input ms-1 me-2" type="radio" name="Cycle(R/I)" id="cycleRegular" value="2" {% if sel_cycle == 2 %}checked{% endif %} required>
+                                    <label class="form-check-label fw-medium text-dark" for="cycleRegular">
+                                        Regular Cycles
+                                        <span class="d-block text-muted x-small fw-normal">Periods arrive predictably every 21 to 35 days.</span>
+                                    </label>
+                                </div>
+                                <div class="form-check p-2-5 rounded-3 border bg-light">
+                                    <input class="form-check-input ms-1 me-2" type="radio" name="Cycle(R/I)" id="cycleIrregular" value="4" {% if sel_cycle in [4, 5] %}checked{% endif %} required>
+                                    <label class="form-check-label fw-medium text-dark" for="cycleIrregular">
+                                        Irregular Cycles
+                                        <span class="d-block text-muted x-small fw-normal">Unpredictable intervals, skipped periods, or &lt;21 / &gt;35 days.</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Period Flow Duration -->
+                        <div class="col-md-6">
+                            <label for="cycleLength" class="form-label fw-semibold">Period Flow Duration (days) <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="cycleLength" name="Cycle length(days)" 
+                                   min="0" max="20" step="1" required 
+                                   value="{{ form_values.get('Cycle length(days)', defaults.get('Cycle length(days)', 5)|int) }}"
+                                   placeholder="e.g. 5">
+                            <div class="form-text x-small">
+                                Number of bleeding days during a typical menstrual period (typically 3–7 days; 0 if absent).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Physical & Hormonal Symptoms -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden">
+                <div class="card-header bg-lavender-subtle border-bottom border-lavender py-3 px-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="section-icon bg-white text-primary-custom rounded-circle p-1 shadow-xs">
+                            <i class="bi bi-activity fs-5"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">3. Physical & Dermatological Symptoms</h5>
+                            <span class="text-muted x-small">Symptoms commonly associated with androgen and metabolic fluctuations</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <!-- Weight Gain -->
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 border bg-light">
+                                <label class="form-label fw-semibold d-block mb-1">Recent or Unexplained Weight Gain?</label>
+                                <div class="text-muted x-small mb-2">Noticeable difficulty maintaining weight despite no major dietary change.</div>
+                                {% set wg = form_values.get('Weight gain(Y/N)', defaults.get('Weight gain(Y/N)', 0))|int %}
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Weight gain(Y/N)" id="wgNo" value="0" {% if wg == 0 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="wgNo">No</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Weight gain(Y/N)" id="wgYes" value="1" {% if wg == 1 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="wgYes">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hair Growth (Hirsutism) -->
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 border bg-light">
+                                <label class="form-label fw-semibold d-block mb-1">Excess Facial or Body Hair?</label>
+                                <div class="text-muted x-small mb-2">Coarse, dark hair growth on chin, upper lip, chest, or abdomen.</div>
+                                {% set hg = form_values.get('hair growth(Y/N)', defaults.get('hair growth(Y/N)', 0))|int %}
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hair growth(Y/N)" id="hgNo" value="0" {% if hg == 0 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="hgNo">No</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hair growth(Y/N)" id="hgYes" value="1" {% if hg == 1 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="hgYes">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Skin Darkening (Acanthosis Nigricans) -->
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 border bg-light">
+                                <label class="form-label fw-semibold d-block mb-1">Skin Darkening (Acanthosis Nigricans)?</label>
+                                <div class="text-muted x-small mb-2">Velvety dark skin patches along the back of the neck, armpits, or groin.</div>
+                                {% set sd = form_values.get('Skin darkening (Y/N)', defaults.get('Skin darkening (Y/N)', 0))|int %}
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Skin darkening (Y/N)" id="sdNo" value="0" {% if sd == 0 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="sdNo">No</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Skin darkening (Y/N)" id="sdYes" value="1" {% if sd == 1 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="sdYes">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hair Loss (Alopecia) -->
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 border bg-light">
+                                <label class="form-label fw-semibold d-block mb-1">Scalp Hair Thinning or Hair Loss?</label>
+                                <div class="text-muted x-small mb-2">Excessive shedding or visible thinning along the crown / parting line.</div>
+                                {% set hl = form_values.get('Hair loss(Y/N)', defaults.get('Hair loss(Y/N)', 0))|int %}
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Hair loss(Y/N)" id="hlNo" value="0" {% if hl == 0 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="hlNo">No</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Hair loss(Y/N)" id="hlYes" value="1" {% if hl == 1 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="hlYes">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Acne / Pimples -->
+                        <div class="col-md-6">
+                            <div class="p-3 rounded-3 border bg-light">
+                                <label class="form-label fw-semibold d-block mb-1">Persistent Acne or Pimples?</label>
+                                <div class="text-muted x-small mb-2">Recurring cystic breakouts along jawline, chin, or upper back.</div>
+                                {% set pmp = form_values.get('Pimples(Y/N)', defaults.get('Pimples(Y/N)', 0))|int %}
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Pimples(Y/N)" id="pmpNo" value="0" {% if pmp == 0 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="pmpNo">No</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Pimples(Y/N)" id="pmpYes" value="1" {% if pmp == 1 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="pmpYes">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Lifestyle & Reproductive History -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4 bg-white overflow-hidden">
+                <div class="card-header bg-lavender-subtle border-bottom border-lavender py-3 px-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="section-icon bg-white text-primary-custom rounded-circle p-1 shadow-xs">
+                            <i class="bi bi-cup-hot fs-5"></i>
+                        </span>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">4. Lifestyle Habits & Reproductive Background</h5>
+                            <span class="text-muted x-small">Dietary, exercise, and reproductive history</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        <!-- Marriage Status (Yrs) -->
+                        <div class="col-md-6">
+                            <label for="marriage" class="form-label fw-semibold">Marriage / Partnership (years)</label>
+                            <input type="number" class="form-control" id="marriage" name="Marraige Status (Yrs)" 
+                                   min="0" max="50" step="1" 
+                                   value="{{ form_values.get('Marraige Status (Yrs)', defaults.get('Marraige Status (Yrs)', 0)|int) }}">
+                            <div class="form-text x-small">Years in marriage / committed union. Enter 0 if single.</div>
+                        </div>
+
+                        <!-- Prior Miscarriages / Abortions -->
+                        <div class="col-md-6">
+                            <label for="abortions" class="form-label fw-semibold">Prior Miscarriages or Abortions (count)</label>
+                            <input type="number" class="form-control" id="abortions" name="No. of aborptions" 
+                                   min="0" max="15" step="1" 
+                                   value="{{ form_values.get('No. of aborptions', defaults.get('No. of aborptions', 0)|int) }}">
+                            <div class="form-text x-small">Total count (enter 0 if none).</div>
+                        </div>
+
+                        <!-- Currently Pregnant -->
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 border bg-light h-100">
+                                <label class="form-label fw-semibold d-block mb-1">Currently Pregnant?</label>
+                                <div class="text-muted x-small mb-2">Active pregnancy status.</div>
+                                {% set prg = form_values.get('Pregnant(Y/N)', defaults.get('Pregnant(Y/N)', 0))|int %}
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Pregnant(Y/N)" id="prgNo" value="0" {% if prg == 0 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="prgNo">No</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Pregnant(Y/N)" id="prgYes" value="1" {% if prg == 1 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="prgYes">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fast Food Intake -->
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 border bg-light h-100">
+                                <label class="form-label fw-semibold d-block mb-1">Frequent Fast Food / Sweets?</label>
+                                <div class="text-muted x-small mb-2">Eating fast food, fried snacks, or sugary items multiple times weekly.</div>
+                                {% set ff = form_values.get('Fast food (Y/N)', defaults.get('Fast food (Y/N)', 1))|int %}
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Fast food (Y/N)" id="ffNo" value="0" {% if ff == 0 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="ffNo">No</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Fast food (Y/N)" id="ffYes" value="1" {% if ff == 1 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="ffYes">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Regular Exercise -->
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3 border bg-light h-100">
+                                <label class="form-label fw-semibold d-block mb-1">Regular Physical Exercise?</label>
+                                <div class="text-muted x-small mb-2">Engaging in &ge;150 mins of moderate physical activity weekly.</div>
+                                {% set ex = form_values.get('Reg.Exercise(Y/N)', defaults.get('Reg.Exercise(Y/N)', 0))|int %}
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Reg.Exercise(Y/N)" id="exNo" value="0" {% if ex == 0 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="exNo">No</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="Reg.Exercise(Y/N)" id="exYes" value="1" {% if ex == 1 %}checked{% endif %} required>
+                                        <label class="form-check-label" for="exYes">Yes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Section -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white text-center">
+                <div class="max-w-600 mx-auto">
+                    <p class="text-muted small mb-3">
+                        <i class="bi bi-lock-fill text-success me-1"></i> Your data will be processed strictly in memory and will not be recorded in any database.
+                    </p>
+                    <button type="submit" class="btn btn-primary-custom btn-lg px-5 py-2-5 rounded-pill shadow-sm" id="btnSubmit">
+                        <i class="bi bi-calculator-fill me-2"></i> Compute Screening Estimate
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
