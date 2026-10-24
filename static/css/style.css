@@ -1,0 +1,175 @@
+/* 
+style.css
+Custom styling for "PCOS Early Screening and Awareness"
+Calm, accessible, women's health oriented visual theme.
+*/
+
+:root {
+    --primary-color: #a8326a;
+    --primary-hover: #8f2658;
+    --primary-light: #f7eaf0;
+    --primary-subtle: #fbeff5;
+    --lavender-subtle: #f3ecf5;
+    --lavender-border: #e6dbe9;
+    --bg-page: #faf8fa;
+    --text-dark: #231d25;
+    --text-secondary: #5e5462;
+    --card-border: #eee6f0;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-dark);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Text and Background Classes */
+.bg-page {
+    background-color: var(--bg-page);
+}
+
+.text-primary-custom {
+    color: var(--primary-color) !important;
+}
+
+.bg-lavender-subtle {
+    background-color: var(--lavender-subtle);
+}
+
+.border-lavender {
+    border-color: var(--lavender-border) !important;
+}
+
+.btn-primary-custom {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #ffffff;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn-primary-custom:hover,
+.btn-primary-custom:focus {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(168, 50, 106, 0.25);
+}
+
+/* Brand Icon */
+.brand-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background-color: var(--primary-subtle);
+    font-size: 1.15rem;
+}
+
+.step-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.15rem;
+}
+
+/* Section Header Icon */
+.section-icon {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Card Improvements */
+.card {
+    border-color: var(--card-border);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hero-card {
+    border-top: 4px solid var(--primary-color) !important;
+}
+
+.shadow-xs {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Typography Utilities */
+.tracking-tight {
+    letter-spacing: -0.025em;
+}
+
+.x-small {
+    font-size: 0.8rem;
+}
+
+.max-w-600 {
+    max-width: 600px;
+}
+
+.max-w-700 {
+    max-width: 700px;
+}
+
+.leading-relaxed {
+    line-height: 1.65;
+}
+
+/* Custom Nav Pills for Plan Duration */
+.custom-pills .nav-link {
+    color: var(--text-secondary);
+    background-color: #ffffff;
+    border: 1px solid var(--lavender-border);
+    margin-left: 0.25rem;
+}
+
+.custom-pills .nav-link.active {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+}
+
+/* Risk Pill */
+.risk-pill {
+    letter-spacing: 0.03em;
+    font-weight: 700;
+}
+
+/* Form Controls Focus State */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(168, 50, 106, 0.15);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Padding utilities */
+.p-2-5 {
+    padding: 0.65rem !important;
+}
+
+.p-3-5 {
+    padding: 1.15rem !important;
+}
+
+.py-2-5 {
+    padding-top: 0.65rem !important;
+    padding-bottom: 0.65rem !important;
+}
+
+.mb-1-5 {
+    margin-bottom: 0.4rem !important;
+}
